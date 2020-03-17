@@ -42,6 +42,7 @@ class Cookie_Notice {
 			'message_text'			=> '',
 			'css_style'				=> 'bootstrap',
 			'css_class'				=> 'button',
+			'aria_label'				=> 'Cookie Notice',
 			'accept_text'			=> '',
 			'refuse_text'			=> '',
 			'refuse_opt'			=> 'no',
@@ -656,6 +657,7 @@ class Cookie_Notice {
 		add_settings_field( 'cn_hide_effect', __( 'Animation', 'cookie-notice' ), array( $this, 'cn_hide_effect' ), 'cookie_notice_options', 'cookie_notice_design' );
 		add_settings_field( 'cn_css_style', __( 'Button style', 'cookie-notice' ), array( $this, 'cn_css_style' ), 'cookie_notice_options', 'cookie_notice_design' );
 		add_settings_field( 'cn_css_class', __( 'Button class', 'cookie-notice' ), array( $this, 'cn_css_class' ), 'cookie_notice_options', 'cookie_notice_design' );
+		add_settings_field( 'cn_aria_label', __( 'Aria label', 'cookie-notice' ), array( $this, 'cn_aria_label' ), 'cookie_notice_options', 'cookie_notice_design' );
 		add_settings_field( 'cn_colors', __( 'Colors', 'cookie-notice' ), array( $this, 'cn_colors' ), 'cookie_notice_options', 'cookie_notice_design' );
 	}
 
@@ -1027,6 +1029,19 @@ class Cookie_Notice {
 				<p class="description">' . __( 'Enter additional button CSS classes separated by spaces.', 'cookie-notice' ) . '</p>
 			</div>
 		</fieldset>';
+  }
+
+	/**
+	 * Aria label option.
+	 */
+	public function cn_aria_label() {
+		echo '
+		<fieldset>
+			<div id="cn_aria_label">
+				<input type="text" class="regular-text" name="cookie_notice_options[aria_label]" value="' . esc_attr( $this->options['general']['aria_label'] ) . '" />
+				<p class="description">' . __( 'Enter aria label value', 'cookie-notice' ) . '</p>
+			</div>
+		</fieldset>';
 	}
 
 	/**
@@ -1091,6 +1106,9 @@ class Cookie_Notice {
 
 			// css button class
 			$input['css_class'] = sanitize_text_field( isset( $input['css_class'] ) ? $input['css_class'] : $this->defaults['general']['css_class'] );
+
+			// aria label
+			$input['aria_label'] = sanitize_text_field( isset( $input['aria_label'] ) && $input['aria_label'] !== '' ? $input['aria_label'] : $this->defaults['general']['aria_label'] );
 
 			// link target
 			$input['link_target'] = sanitize_text_field( isset( $input['link_target'] ) && in_array( $input['link_target'], array_keys( $this->link_targets ) ) ? $input['link_target'] : $this->defaults['general']['link_target'] );
@@ -1217,7 +1235,7 @@ class Cookie_Notice {
 			'see_more_opt'			=> $this->options['general']['see_more_opt'],
 			'link_target'			=> $this->options['general']['link_target'],
 			'link_position'			=> $this->options['general']['link_position'],
-			'aria_label'			=> __( 'Cookie Notice', 'cookie-notice' )
+			'aria_label'			=> $this->options['general']['aria_label'],
 		) );
 
 		if ( $options['see_more'] === 'yes' && $options['link_position'] === 'message' )
