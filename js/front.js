@@ -199,6 +199,10 @@
 			this.noticeContainer.classList.add( 'cn-animated' );
 			this.noticeContainer.classList.add( 'cookie-notice-visible' );
 
+			if (cnArgs.focus_on_load === "1") {
+				this.noticeContainer.focus();
+			}
+
 			// detect animation
 			this.noticeContainer.addEventListener( 'animationend', function handler() {
 				_this.noticeContainer.removeEventListener( 'animationend', handler );

@@ -42,6 +42,7 @@ class Cookie_Notice {
 			'message_text'			=> '',
 			'css_style'				=> 'bootstrap',
 			'css_class'				=> 'button',
+			'focus_on_load'				=> false,
 			'accept_text'			=> '',
 			'refuse_text'			=> '',
 			'refuse_opt'			=> 'no',
@@ -643,6 +644,7 @@ class Cookie_Notice {
 		add_settings_field( 'cn_revoke_opt', __( 'Revoke consent', 'cookie-notice' ), array( $this, 'cn_revoke_opt' ), 'cookie_notice_options', 'cookie_notice_configuration' );
 		add_settings_field( 'cn_refuse_code', __( 'Script blocking', 'cookie-notice' ), array( $this, 'cn_refuse_code' ), 'cookie_notice_options', 'cookie_notice_configuration' );
 		add_settings_field( 'cn_redirection', __( 'Reloading', 'cookie-notice' ), array( $this, 'cn_redirection' ), 'cookie_notice_options', 'cookie_notice_configuration' );
+		add_settings_field( 'cn_focus_on_load', __( 'Focus on load', 'cookie-notice' ), array( $this, 'cn_focus_on_load' ), 'cookie_notice_options', 'cookie_notice_configuration' );
 		add_settings_field( 'cn_on_scroll', __( 'On scroll', 'cookie-notice' ), array( $this, 'cn_on_scroll' ), 'cookie_notice_options', 'cookie_notice_configuration' );
 		add_settings_field( 'cn_on_click', __( 'On click', 'cookie-notice' ), array( $this, 'cn_on_click' ), 'cookie_notice_options', 'cookie_notice_configuration' );
 		add_settings_field( 'cn_time', __( 'Cookie expiry', 'cookie-notice' ), array( $this, 'cn_time' ), 'cookie_notice_options', 'cookie_notice_configuration' );
@@ -777,6 +779,16 @@ class Cookie_Notice {
 		echo '
 		<fieldset>
 			<label><input id="cn_redirection" type="checkbox" name="cookie_notice_options[redirection]" value="1" ' . checked( true, $this->options['general']['redirection'], false ) . ' />' . __( 'Enable to reload the page after the notice is accepted.', 'cookie-notice' ) . '</label>
+		</fieldset>';
+	}
+
+	/**
+	 * Focus on page load.
+	 */
+	public function cn_focus_on_load() {
+		echo '
+		<fieldset>
+			<label><input id="cn_focus_on_load" type="checkbox" name="cookie_notice_options[focus_on_load]" value="1" ' . checked( true, $this->options['general']['focus_on_load'], false ) . ' />' . __( 'Enable to focus on the cookie notice banner after the page loads.', 'cookie-notice' ) . '</label>
 		</fieldset>';
 	}
 
@@ -1111,10 +1123,13 @@ class Cookie_Notice {
 
 			// hide effect
 			$input['hide_effect'] = sanitize_text_field( isset( $input['hide_effect'] ) && in_array( $input['hide_effect'], array_keys( $this->effects ) ) ? $input['hide_effect'] : $this->defaults['general']['hide_effect'] );
-			
+
+			// focus on load
+			$input['focus_on_load'] = isset( $input['focus_on_load'] );
+
 			// redirection
 			$input['redirection'] = isset( $input['redirection'] );
-			
+
 			// on scroll
 			$input['on_scroll'] = (bool) isset( $input['on_scroll'] ) ? 'yes' : 'no';
 
@@ -1204,6 +1219,7 @@ class Cookie_Notice {
 			'position'				=> $this->options['general']['position'],
 			'css_style'				=> $this->options['general']['css_style'],
 			'css_class'				=> $this->options['general']['css_class'],
+			'focus_on_load'				=> $this->options['general']['focus_on_load'],
 			'button_class'			=> 'cn-button',
 			'colors'				=> $this->options['general']['colors'],
 			'message_text'			=> $this->options['general']['message_text'],
@@ -1230,7 +1246,7 @@ class Cookie_Notice {
 		// message output
 		$output = '
 		<!-- Cookie Notice plugin v' . $this->defaults['version'] . ' by Digital Factory https://dfactory.eu/ -->
-		<div id="cookie-notice" role="banner" class="cookie-notice-hidden cookie-revoke-hidden cn-position-' . $options['position'] . '" aria-label="' . $options['aria_label'] . '" style="background-color: ' . $options['colors']['bar'] . ';">'
+		<div id="cookie-notice" role="banner" class="cookie-notice-hidden cookie-revoke-hidden cn-position-' . $options['position'] . '" aria-label="' . $options['aria_label'] . '" '. ( $options['focus_on_load'] ? 'tabindex="-1"' : '' ) . ' style="background-color: ' . $options['colors']['bar'] . ';">'
 			. '<div class="cookie-notice-container" style="color: ' . $options['colors']['text'] . ';">'
 			. '<span id="cn-notice-text" class="cn-text-container">'. $options['message_text'] . '</span>'
 			. '<span id="cn-notice-buttons" class="cn-buttons-container"><a href="#" id="cn-accept-cookie" data-cookie-set="accept" class="cn-set-cookie ' . $options['button_class'] . ( $options['css_style'] !== 'none' ? ' ' . $options['css_style'] : '' ) . ( $options['css_class'] !== '' ? ' ' . $options['css_class'] : '' ) . '">' . $options['accept_text'] . '</a>'
@@ -1418,6 +1434,7 @@ class Cookie_Notice {
 				'cookiePath'			=> ( defined( 'COOKIEPATH' ) ? (string) COOKIEPATH : '' ),
 				'cookieDomain'			=> ( defined( 'COOKIE_DOMAIN' ) ? (string) COOKIE_DOMAIN : '' ),
 				'redirection'			=> $this->options['general']['redirection'],
+				'focus_on_load'			=> $this->options['general']['focus_on_load'],
 				'cache'					=> defined( 'WP_CACHE' ) && WP_CACHE,
 				'refuse'				=> $this->options['general']['refuse_opt'],
 				'revoke_cookies'		=> (int) $this->options['general']['revoke_cookies'],
